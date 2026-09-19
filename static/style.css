@@ -355,6 +355,11 @@ body {
   font-weight: 600;
 }
 
+.credits__byline a{
+  color: var(--flame);
+  text-decoration: dotted;
+}
+
 /* =========================================================
    Responsive
 ========================================================= */
