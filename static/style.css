@@ -357,7 +357,7 @@ body {
 
 .credits__byline a{
   color: var(--flame);
-  text-decoration: dotted;
+  text-decoration: underline;
 }
 
 /* =========================================================
