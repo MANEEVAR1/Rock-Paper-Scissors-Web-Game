@@ -1,2 +1,1 @@
-# Python-Projects
-Includes practice projects in raw Python 🐍
+Rock Paper Scissors Game made in Python 🐍
