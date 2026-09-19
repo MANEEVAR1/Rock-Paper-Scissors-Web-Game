@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rock Paper Scissors — Showdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <div class="halftone" aria-hidden="true"></div>
+
+  <main class="arena">
+
+    <header class="marquee">
+      <h1 class="marquee__title">ROCK<span class="marquee__dot">·</span>PAPER<span class="marquee__dot">·</span>SCISSORS</h1>
+      <p class="marquee__sub">best two out of anything — the deck never gets tired</p>
+    </header>
+
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="scoreboard__panel scoreboard__panel--cpu">
+        <span class="scoreboard__label">Computer</span>
+        <span class="scoreboard__value" id="score-cpu">0</span>
+      </div>
+      <div class="scoreboard__panel scoreboard__panel--tie">
+        <span class="scoreboard__label">Ties</span>
+        <span class="scoreboard__value" id="score-tie">0</span>
+      </div>
+      <div class="scoreboard__panel scoreboard__panel--you">
+        <span class="scoreboard__label">You</span>
+        <span class="scoreboard__value" id="score-you">0</span>
+      </div>
+    </section>
+
+    <section class="ring" id="ring">
+      <div class="fighter fighter--cpu">
+        <span class="fighter__tag">COMPUTER</span>
+        <div class="fighter__stage" id="cpu-stage">
+          <div class="fighter__shape" id="cpu-shape">?</div>
+        </div>
+      </div>
+
+      <div class="ring__center">
+        <div class="ring__banner" id="banner">READY?</div>
+        <div class="ring__vs">VS</div>
+      </div>
+
+      <div class="fighter fighter--you">
+        <span class="fighter__tag">YOU</span>
+        <div class="fighter__stage" id="you-stage">
+          <div class="fighter__shape" id="you-shape">?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Choose your move">
+      <button class="pick" data-choice="rock" id="pick-rock">
+        <span class="pick__icon" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path class="pick__ink" d="M50 8c14 0 20 10 22 20 6 2 12 8 12 18v10c0 20-14 36-34 36s-34-16-34-36V46c0-9 5-15 11-18C29 18 36 8 50 8z" fill="var(--paper)" stroke="var(--ink)" stroke-width="6" stroke-linejoin="round"/><path d="M34 46v20M50 42v24M66 46v20" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></svg>
+        </span>
+        <span class="pick__label">Rock</span>
+      </button>
+
+      <button class="pick" data-choice="paper" id="pick-paper">
+        <span class="pick__icon" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><rect class="pick__ink" x="20" y="14" width="60" height="76" rx="14" fill="var(--paper)" stroke="var(--ink)" stroke-width="6"/><path d="M32 34h36M32 50h36M32 66h24" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></svg>
+        </span>
+        <span class="pick__label">Paper</span>
+      </button>
+
+      <button class="pick" data-choice="scissors" id="pick-scissors">
+        <span class="pick__icon" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><circle class="pick__ink" cx="30" cy="74" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="6"/><circle class="pick__ink" cx="70" cy="74" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="6"/><path d="M34 66 74 18M66 66 26 18" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/></svg>
+        </span>
+        <span class="pick__label">Scissors</span>
+      </button>
+    </section>
+
+    <section class="afterword" id="afterword" hidden>
+      <p id="afterword-text"></p>
+      <button class="reset" id="play-again">Play again</button>
+    </section>
+
+    <footer class="credits">
+      <p>Rules never change: rock blunts scissors, scissors cut paper, paper covers rock.</p>
+    </footer>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

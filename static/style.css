@@ -1,0 +1,376 @@
+/* =========================================================
+   Rock · Paper · Scissors — "Backyard Showdown" theme
+   Tokens
+========================================================= */
+:root {
+  --ink: #17151b;
+  --paper: #f2ecd8;
+  --paper-dim: #e4d9bb;
+  --flame: #ff5a36;
+  --moss: #3fa34d;
+  --berry: #d4383c;
+  --mustard: #f2b705;
+
+  --font-display: "Anton", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+
+  --border: 4px;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+}
+
+body {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+           env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  overflow-x: hidden;
+}
+
+/* Halftone dot texture — quiet, fixed, never distracts */
+.halftone {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(var(--paper-dim) 1.4px, transparent 1.4px);
+  background-size: 22px 22px;
+  opacity: 0.06;
+}
+
+.arena {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+/* =========================================================
+   Marquee header
+========================================================= */
+.marquee { text-align: center; }
+
+.marquee__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  font-size: clamp(1.9rem, 6.5vw, 3.4rem);
+  line-height: 1;
+  margin: 0;
+  color: var(--paper);
+}
+
+.marquee__dot {
+  color: var(--flame);
+  margin: 0 0.12em;
+}
+
+.marquee__sub {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  color: var(--paper-dim);
+}
+
+/* =========================================================
+   Scoreboard
+========================================================= */
+.scoreboard {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  justify-content: center;
+}
+
+.scoreboard__panel {
+  flex: 1;
+  max-width: 160px;
+  background: var(--paper);
+  color: var(--ink);
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 10px 6px;
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+.scoreboard__panel--tie { transform: rotate(0.6deg); }
+.scoreboard__panel--you { transform: rotate(1deg); }
+
+.scoreboard__label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: #4a4636;
+}
+
+.scoreboard__value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.scoreboard__panel--cpu .scoreboard__value { color: var(--berry); }
+.scoreboard__panel--tie .scoreboard__value { color: var(--mustard); }
+.scoreboard__panel--you .scoreboard__value { color: var(--moss); }
+
+/* =========================================================
+   Ring — the duel panel
+========================================================= */
+.ring {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 26px 18px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  transform: rotate(-0.4deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ring.shake {
+  animation: ring-shake 0.4s ease;
+}
+
+@keyframes ring-shake {
+  0%, 100% { transform: rotate(-0.4deg) translateX(0); }
+  20% { transform: rotate(-1deg) translateX(-6px); }
+  40% { transform: rotate(0.8deg) translateX(6px); }
+  60% { transform: rotate(-0.6deg) translateX(-4px); }
+  80% { transform: rotate(0.5deg) translateX(3px); }
+}
+
+.fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.fighter__tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #4a4636;
+}
+
+.fighter__stage {
+  width: 96px;
+  height: 96px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-dim);
+}
+
+.fighter__shape {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  transition: transform 0.2s ease;
+}
+
+.fighter__shape svg { width: 56px; height: 56px; }
+
+.fighter__stage.win {
+  border-color: var(--moss);
+  box-shadow: 0 0 0 4px rgba(63, 163, 77, 0.25);
+}
+.fighter__stage.lose {
+  border-color: var(--berry);
+  box-shadow: 0 0 0 4px rgba(212, 56, 60, 0.22);
+}
+.fighter__stage.tie {
+  border-color: var(--mustard);
+  box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.25);
+}
+
+.fighter__stage.reveal .fighter__shape {
+  animation: punch-in 0.32s cubic-bezier(.2, 1.4, .5, 1);
+}
+
+@keyframes punch-in {
+  0% { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.ring__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.ring__vs {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--flame);
+}
+
+.ring__banner {
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 2.6vw, 1.15rem);
+  text-align: center;
+  min-height: 1.4em;
+  color: var(--ink);
+}
+
+.ring__banner.count {
+  color: var(--flame);
+  animation: count-pulse 0.5s ease;
+}
+
+@keyframes count-pulse {
+  0% { transform: scale(0.7); opacity: 0.4; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.ring__banner.win { color: var(--moss); }
+.ring__banner.lose { color: var(--berry); }
+.ring__banner.tie { color: var(--mustard); }
+
+/* =========================================================
+   Controls — the choice buttons
+========================================================= */
+.controls {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pick {
+  flex: 1 1 140px;
+  max-width: 170px;
+  background: var(--paper);
+  color: var(--ink);
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 14px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.pick__icon svg { width: 48px; height: 48px; display: block; }
+
+.pick:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--ink);
+  background: var(--paper-dim);
+}
+
+.pick:active,
+.pick.pressed {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.pick:focus-visible {
+  outline: 3px solid var(--flame);
+  outline-offset: 3px;
+}
+
+.pick:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: 5px 5px 0 var(--ink);
+  transform: none;
+}
+
+/* =========================================================
+   Afterword — result recap + replay
+========================================================= */
+.afterword {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.afterword p {
+  margin: 0;
+  color: var(--paper-dim);
+  font-size: 0.95rem;
+}
+
+.reset {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--mustard);
+  border: var(--border) solid var(--ink);
+  border-radius: var(--radius);
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.reset:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+.reset:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+
+/* =========================================================
+   Footer
+========================================================= */
+.credits {
+  text-align: center;
+  color: #6b6754;
+  font-size: 0.78rem;
+  max-width: 420px;
+}
+
+/* =========================================================
+   Responsive
+========================================================= */
+@media (max-width: 520px) {
+  .ring {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .ring__center { order: 2; margin: 6px 0; }
+  .fighter--cpu { order: 1; }
+  .fighter--you { order: 3; }
+  .scoreboard__panel { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Light-mode viewers still get the same inked poster look on purpose —
+   the palette is the brand, not a light/dark toggle. */
