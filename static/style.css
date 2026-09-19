@@ -350,7 +350,7 @@ body {
 }
 
 .credits__byline {
-  margin-top: 12px;
+  margin-top: 24px;
   color: var(--flame);
   font-weight: 600;
 }
