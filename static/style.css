@@ -60,7 +60,39 @@ body {
 /* =========================================================
    Marquee header
 ========================================================= */
-.marquee { text-align: center; }
+.marquee { text-align: center; position: relative; }
+
+.mute-toggle {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.mute-toggle:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.mute-toggle:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+@media (max-width: 480px) {
+  .mute-toggle {
+    position: static;
+    margin: 0 auto 10px;
+  }
+}
 
 .marquee__title {
   font-family: var(--font-display);

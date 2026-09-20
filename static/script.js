@@ -48,6 +48,8 @@ const els = {
   afterwordText: document.getElementById("afterword-text"),
   playAgain: document.getElementById("play-again"),
   leaveMatch: document.getElementById("leave-match"),
+
+  muteToggle: document.getElementById("mute-toggle"),
 };
 
 const score = { cpu: 0, tie: 0, you: 0 };
@@ -56,6 +58,113 @@ let mode = null; // "computer" | "online"
 let socket = null;
 let roomCode = null;
 let awaitingOnlineResult = false;
+
+/* ---------------------------------------------------------
+   Synthesized audio — no external files, no licensing issues.
+   One AudioContext, one master gain node (mute controls this),
+   a looping ambient pattern, and three distinct result stingers.
+--------------------------------------------------------- */
+const AUDIO_KEY = "rps-muted";
+
+const audio = {
+  ctx: null,
+  master: null,
+  muted: localStorage.getItem(AUDIO_KEY) === "true",
+  loopTimer: null,
+  loopStep: 0,
+};
+
+function getCtx() {
+  if (!audio.ctx) {
+    audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    audio.master = audio.ctx.createGain();
+    audio.master.gain.value = audio.muted ? 0 : 0.35;
+    audio.master.connect(audio.ctx.destination);
+  }
+  if (audio.ctx.state === "suspended") audio.ctx.resume();
+  return audio.ctx;
+}
+
+function playTone({ freq, start, duration, type = "square", peak = 0.5, glideTo = null }) {
+  const ctx = getCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, start + duration);
+
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(peak, start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+  osc.connect(gain);
+  gain.connect(audio.master);
+  osc.start(start);
+  osc.stop(start + duration + 0.02);
+}
+
+const LOOP_BASS = [110, 110, 146.83, 110, 130.81, 110, 98, 110];
+const LOOP_BLIP = [440, null, 587.33, null, 523.25, null, 440, null];
+const LOOP_STEP_MS = 260;
+
+function scheduleLoopStep() {
+  if (audio.muted) {
+    audio.loopTimer = setTimeout(scheduleLoopStep, LOOP_STEP_MS);
+    return;
+  }
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  const i = audio.loopStep % LOOP_BASS.length;
+
+  playTone({ freq: LOOP_BASS[i], start: now, duration: 0.18, type: "triangle", peak: 0.25 });
+  if (LOOP_BLIP[i]) {
+    playTone({ freq: LOOP_BLIP[i], start: now + 0.01, duration: 0.1, type: "square", peak: 0.08 });
+  }
+
+  audio.loopStep += 1;
+  audio.loopTimer = setTimeout(scheduleLoopStep, LOOP_STEP_MS);
+}
+
+function startAmbientLoop() {
+  if (audio.loopTimer) return;
+  scheduleLoopStep();
+}
+
+function playWinSound() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+    playTone({ freq, start: now + i * 0.09, duration: 0.16, type: "square", peak: 0.35 });
+  });
+}
+
+function playLoseSound() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  playTone({ freq: 220, start: now, duration: 0.5, type: "sawtooth", peak: 0.3, glideTo: 110 });
+  playTone({ freq: 164.81, start: now + 0.18, duration: 0.55, type: "sawtooth", peak: 0.25, glideTo: 82 });
+}
+
+function playTieSound() {
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  playTone({ freq: 349.23, start: now, duration: 0.14, type: "triangle", peak: 0.28 });
+  playTone({ freq: 349.23, start: now + 0.18, duration: 0.14, type: "triangle", peak: 0.28 });
+}
+
+function setMuted(muted) {
+  audio.muted = muted;
+  localStorage.setItem(AUDIO_KEY, String(muted));
+  if (audio.master) {
+    audio.master.gain.setTargetAtTime(muted ? 0 : 0.35, getCtx().currentTime, 0.05);
+  }
+  updateMuteButton();
+}
+
+function updateMuteButton() {
+  els.muteToggle.textContent = audio.muted ? "🔇" : "🔊";
+  els.muteToggle.setAttribute("aria-label", audio.muted ? "Unmute music" : "Mute music");
+}
 
 /* ---------------------------------------------------------
    Screen management
@@ -80,6 +189,7 @@ function showMode(newMode) {
 
   resetStages();
   setBanner(newMode === "online" ? "MATCHED! READY?" : "READY?");
+  startAmbientLoop();
 }
 
 function showLobby() {
@@ -148,17 +258,20 @@ function reveal(userChoice, rivalChoice, result, rivalNoun) {
     setBanner("YOU WIN!", "win");
     score.you += 1;
     els.ring.classList.add("shake");
+    playWinSound();
   } else if (result === "lose") {
     els.youStage.classList.add("lose");
     els.cpuStage.classList.add("win");
     setBanner("YOU LOSE", "lose");
     score.cpu += 1;
     els.ring.classList.add("shake");
+    playLoseSound();
   } else {
     els.youStage.classList.add("tie");
     els.cpuStage.classList.add("tie");
     setBanner("IT'S A TIE", "tie");
     score.tie += 1;
+    playTieSound();
   }
 
   setTimeout(() => els.ring.classList.remove("shake"), 420);
@@ -324,3 +437,10 @@ els.playAgain.addEventListener("click", () => {
 });
 
 els.leaveMatch.addEventListener("click", backToModeSelect);
+
+els.muteToggle.addEventListener("click", () => {
+  getCtx(); // first click anywhere counts as the user gesture browsers require
+  setMuted(!audio.muted);
+});
+
+updateMuteButton();
