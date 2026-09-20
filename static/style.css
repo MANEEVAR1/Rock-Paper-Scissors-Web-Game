@@ -60,17 +60,22 @@ body {
 /* =========================================================
    Marquee header
 ========================================================= */
-.marquee { text-align: center; position: relative; }
+.marquee { text-align: center; }
+
+.marquee__bar {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 6px;
+}
 
 .mute-toggle {
-  position: absolute;
-  top: -6px;
-  right: 0;
   background: var(--paper);
   border: 3px solid var(--ink);
   border-radius: 50%;
   width: 40px;
   height: 40px;
+  flex-shrink: 0;
   font-size: 1.1rem;
   cursor: pointer;
   box-shadow: 3px 3px 0 var(--ink);
@@ -85,13 +90,6 @@ body {
 .mute-toggle:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 var(--ink);
-}
-
-@media (max-width: 480px) {
-  .mute-toggle {
-    position: static;
-    margin: 0 auto 10px;
-  }
 }
 
 .marquee__title {
