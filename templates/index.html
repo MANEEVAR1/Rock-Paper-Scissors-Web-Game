@@ -20,9 +20,47 @@
       <p class="marquee__sub">best two out of anything — the deck never gets tired</p>
     </header>
 
-    <section class="scoreboard" aria-label="Scoreboard">
+    <!-- Mode select -->
+    <section class="mode-select" id="mode-select">
+      <button class="mode-card" id="mode-computer">
+        <span class="mode-card__title">Vs Computer</span>
+        <span class="mode-card__sub">Play solo, right now</span>
+      </button>
+      <button class="mode-card mode-card--alt" id="mode-online">
+        <span class="mode-card__title">Vs a Friend</span>
+        <span class="mode-card__sub">Live, across two devices</span>
+      </button>
+    </section>
+
+    <!-- Online lobby -->
+    <section class="lobby" id="lobby" hidden>
+      <div class="lobby__panel">
+        <h2 class="lobby__heading">Create a room</h2>
+        <p class="lobby__text">Get a code, send it to your friend.</p>
+        <button class="reset" id="create-room-btn">Create room</button>
+        <div class="lobby__code" id="room-code-display" hidden>
+          Room code: <span id="room-code-value"></span>
+        </div>
+        <p class="lobby__status" id="host-status" hidden>Waiting for your friend to join…</p>
+      </div>
+
+      <div class="lobby__divider">or</div>
+
+      <div class="lobby__panel">
+        <h2 class="lobby__heading">Join a room</h2>
+        <p class="lobby__text">Enter the code they sent you.</p>
+        <input class="lobby__input" id="join-code-input" maxlength="5" placeholder="ABCDE" autocapitalize="characters" />
+        <button class="reset" id="join-room-btn">Join room</button>
+      </div>
+
+      <p class="lobby__error" id="lobby-error" hidden></p>
+      <button class="lobby__back" id="lobby-back">← Back</button>
+    </section>
+
+    <!-- Scoreboard -->
+    <section class="scoreboard" id="scoreboard" aria-label="Scoreboard" hidden>
       <div class="scoreboard__panel scoreboard__panel--cpu">
-        <span class="scoreboard__label">Computer</span>
+        <span class="scoreboard__label" id="score-label-rival">Computer</span>
         <span class="scoreboard__value" id="score-cpu">0</span>
       </div>
       <div class="scoreboard__panel scoreboard__panel--tie">
@@ -35,9 +73,10 @@
       </div>
     </section>
 
-    <section class="ring" id="ring">
+    <!-- Ring -->
+    <section class="ring" id="ring" hidden>
       <div class="fighter fighter--cpu">
-        <span class="fighter__tag">COMPUTER</span>
+        <span class="fighter__tag" id="fighter-tag-rival">COMPUTER</span>
         <div class="fighter__stage" id="cpu-stage">
           <div class="fighter__shape" id="cpu-shape">?</div>
         </div>
@@ -56,7 +95,8 @@
       </div>
     </section>
 
-    <section class="controls" aria-label="Choose your move">
+    <!-- Controls -->
+    <section class="controls" id="controls" aria-label="Choose your move" hidden>
       <button class="pick" data-choice="rock" id="pick-rock">
         <span class="pick__icon" aria-hidden="true">
           <svg viewBox="0 0 100 100"><path class="pick__ink" d="M50 8c14 0 20 10 22 20 6 2 12 8 12 18v10c0 20-14 36-34 36s-34-16-34-36V46c0-9 5-15 11-18C29 18 36 8 50 8z" fill="var(--paper)" stroke="var(--ink)" stroke-width="6" stroke-linejoin="round"/><path d="M34 46v20M50 42v24M66 46v20" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></svg>
@@ -81,16 +121,20 @@
 
     <section class="afterword" id="afterword" hidden>
       <p id="afterword-text"></p>
-      <button class="reset" id="play-again">Play again</button>
+      <div class="afterword__actions">
+        <button class="reset" id="play-again">Play again</button>
+        <button class="lobby__back" id="leave-match" hidden>Leave match</button>
+      </div>
     </section>
 
     <footer class="credits">
       <p>Rules never change: rock blunts scissors, scissors cut paper, paper covers rock.</p>
-      <p class="credits__byline">Developed by <a href="https://www.linkedin.com/in/maneev-arora" target="_blank">Maneev Arora</a>🚀</p>
+      <p class="credits__byline">Developed by Maneev Arora🚀</p>
     </footer>
 
   </main>
 
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
